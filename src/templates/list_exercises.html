@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elasticsearch Certification Exercises - Exercise chapters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div>
+      <h1>Exercise chapters</h1>
+
+      <ul>
+        {% for test in test_set %}
+        <li><a href="/select/{{loop.index}}">{{ test }}</a></li>
+        {% endfor %}
+      </ul>
+
+      <br />
+      <p>
+        <a href="/reset-all">Reset status on all chapters</a>
+      </p>
+    </div>
+  </body>
+</html>

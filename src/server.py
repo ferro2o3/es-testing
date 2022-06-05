@@ -1,33 +1,31 @@
-from flask import Flask
-import os
-import subprocess
+from flask import Flask, render_template
+from exercise_runner.exercises import exercises
+from es_testing import es_testing
 
-server = Flask(__name__)
-
-
-@server.route("/")
-def hello():
-
-    my_list = os.listdir("./tests")
-
-    run_it = [
-        "pytest",
-        "-x",
-        "--tb=no",
-        "--color=no",
-        "-s",
-        "tests/es-test/0001_server_is_alive_test.py",
-        "-m",
-        "precheck",
-    ]
-
-    result = subprocess.run(run_it, stdout=subprocess.PIPE)
-
-    # pytest -x --tb=no --color=yes -s tests/es-test/0001_server_is_alive_test.py -m precheck
-    # pytest -x --tb=no --color=yes -s tests/es-test/0001_server_is_alive_test.py -m postcheck
-
-    return "Hello World4!"
+# server = Flask(__name__)
 
 
-if __name__ == "__main__":
-    server.run(host="0.0.0.0", debug=True)
+# app = Flask(__name__)
+# app.register_blueprint(exercises)
+
+
+# def hello():
+
+#     my_list = os.listdir("./tests")
+
+
+#     return "Hello World4!"
+
+
+def page_not_found(e):
+    return render_template("404.html"), 404
+
+
+def create_app(config_filename=None):
+    app = Flask(__name__)
+    app.register_error_handler(404, page_not_found)
+
+    app.register_blueprint(es_testing)
+    app.register_blueprint(exercises)
+
+    return app

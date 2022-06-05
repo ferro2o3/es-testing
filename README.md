@@ -58,3 +58,30 @@ es-testing is licensed under either of the following, at your option:
 
     Apache License, Version 2.0, ([LICENSE-APACHE](https://github.com/ferro2o3/es-testing/blob/main/LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
     MIT License ([LICENSE-MIT](https://github.com/ferro2o3/es-testing/blob/main/LICENSE-MIT) or https://opensource.org/licenses/MIT)
+
+# Starting
+
+To start the elasticsearch clusters:
+
+    docker-compose up
+
+This will start a minimal 2 cluster setup with just one node, to make this compatible with all the exercises required for the Elasticsearch Certification Exam.
+
+# Run the tests
+
+Just type to setup:
+
+    python -m venv .venv
+    . .venv/bin/activte
+    pip install -U pip
+    pip install -r requirements.txt
+
+And then to run it:
+
+    flask run src/server.py
+
+If you are developing new tests, you may need to run instead:
+
+    pip install -r requirements.dev.txt
+
+The main difference is the addition of black and flask8 for code styling / formating.

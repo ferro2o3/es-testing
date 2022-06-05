@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elasticsearch Certification Exercises</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div>
+      <h1>Elasticsearch Certification Exercises</h1>
+
+      {% if number == 0 %}
+      <p>Welcome to the first exercise</p>
+      {% else %}
+      <p>Exercise number {{number}}</p>
+      {% endif %} {{description}}
+
+      <br />
+
+      {% if result %}
+      <p>The result is not correct</p>
+      <code>{{result}}</code>
+      {% endif %}
+
+      <br />
+      <p>
+        <a href="/exercises/{{number}}">Check if your solution is correct!</a>
+      </p>
+    </div>
+  </body>
+</html>
