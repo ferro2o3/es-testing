@@ -132,3 +132,5 @@ dmypy.json
 
 build/
 data/
+certs/
+.env
