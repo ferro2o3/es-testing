@@ -1,71 +1,74 @@
-# ES Testing
+# Elasticsearch Testing
 
-The objective of this project is to both have a series of tests running against an elasticsearch server, and run your own unit tests against it.
+This project is very loosely based on [rustlings](https://github.com/rust-lang/rustlings).
 
-The initial objective is to run tests in a step by step way, with test results being shown in the docker standard output.
+The objective is to help with validating your knowledge on all things elasticsearch.
 
-This is to allow the run of a test series, which is a tool used for testing your knowledge of [Elasticsearch Certified Engineer](https://www.elastic.co/training/elastic-certified-engineer-exam) topics.
+It's designed around the [Elasticsearch Certified Engineer](https://www.elastic.co/training/elastic-certified-engineer-exam) topics, but has a couple more things added on it.
 
-In the current version, only tests inside `./tests/es-test` folder are run.
-
-And if you have any test that you think would be great to add into the base certification test list, feel free to fork this project and create a PR with the new test stating to which topic it belongs to.
-
-Any contributor has to accept both the MIT license and accept that their contributions will also be MIT licensed. The act of pushing a PR with a contribution is acceptance of the license and this terms.
-
-For more details check the [LICENSE](https://github.com/ferro2o3/es-testing/blob/main/LICENSE) before contributing.
 
 # Methodology
 
-The whole concept was in a good part inspired on [rustlings](https://github.com/rust-lang/rustlings), the brilliant and simple step by step pratical exercices for rust-lang learning.
+You run the setup (docker compose containers), then run the python project (very simple flask python app), and hit the http endpoint of it.
 
-At it's bare simple test, the tasks executed are:
+Then you are proposed a list of topics.
 
-- check if the backend is running (aka ping elasticsearch root endpoint to check if it's ready)
-- check if the health is green (aka ping elasticsearch `/_health` to check if all shards are accounted for - green state)
-- start a simple UI
+Each topic is composed by a series of exercises which will validate themselves and stop either on the next execise that needs completion or at the end of it.
 
-The UI will show the list of folders available for testing (only es-test by default), and when that is pressed, it will run the exercises, one by one.
+Then you can either reset the topic to restart it, or continue to another topic.
 
-The server keeps datastate on elasticsearch, meaning that the server data folder is kept between restarts in a local folder (`./data`).
+State is preserved in the data folder (along with the elasticsearch data files), so if you remove that folder, everything will be reset.
 
-Deleting that folder, will restart the tests from the begin.
+# Setup
 
-# How does a test works?
+Start the elasticsearch clusters with:
 
-The test works by infinite loop in python that triggers the following:
+```
+docker-compose up
+```
 
-    make count = 0, then
+Then, after a while, the two clusters should be up.
 
-    Check loop
-        - check if the result matches the expected
-            - if not, update current test to count (current test should show on the screen)
-            - sleep 5 seconds
-        - if yes, update count += 1
-        - if there are no more tests, bail out
+The first follows Elastic [recommended setup](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-compose-file) for multi-node stack with security (3 nodes + kibana), and the second with a minimal [single node cluster](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-dev-mode).
 
-# References
+> Neither are "production ready"! For that please consult the [guide](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-prod-prerequisites) and other recommended practices for your platform of choice.
 
-- [Python Docker image](https://www.docker.com/blog/containerized-python-development-part-1/)
-- [Elasticsearch image](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
-- [rustlings](https://github.com/rust-lang/rustlings)
-- [Elasticsearch Certification](https://www.elastic.co/training/elastic-certified-engineer-exam)
-- [Layout](https://hackersandslackers.com/flask-jinja-templates/)
-- [Licensing, Documentation and Style](https://github.com/SergioBenitez/Rocket/blob/master/README.md)
+After running the command, doing `docker ps` on a terminal should result in something similar to:
 
-# License
+```
+CONTAINER ID   IMAGE                                                  COMMAND                  CREATED          STATUS                   PORTS                              NAMES
+dd09b6b01f5b   docker.elastic.co/elasticsearch/elasticsearch:7.17.4   "/bin/tini -- /usr/l…"   9 minutes ago    Up 9 minutes             9300/tcp, 0.0.0.0:9201->9200/tcp   cluster2-es04
+6ed2fc610311   docker.elastic.co/kibana/kibana:7.17.4                 "/bin/tini -- /usr/l…"   12 minutes ago   Up 8 minutes (healthy)   0.0.0.0:5601->5601/tcp             es-testing_kibana_1
+0966f996e275   docker.elastic.co/elasticsearch/elasticsearch:7.17.4   "/bin/tini -- /usr/l…"   13 minutes ago   Up 9 minutes (healthy)   9200/tcp, 9300/tcp                 cluster1-es03
+5102ca270771   docker.elastic.co/elasticsearch/elasticsearch:7.17.4   "/bin/tini -- /usr/l…"   13 minutes ago   Up 9 minutes (healthy)   9200/tcp, 9300/tcp                 cluster1-es02
+dcdda678ea2a   docker.elastic.co/elasticsearch/elasticsearch:7.17.4   "/bin/tini -- /usr/l…"   13 minutes ago   Up 9 minutes (healthy)   0.0.0.0:9200->9200/tcp, 9300/tcp   cluster1-es01
+```
 
-es-testing is licensed under either of the following, at your option:
+This means that 2 clusters were created:
 
-    Apache License, Version 2.0, ([LICENSE-APACHE](https://github.com/ferro2o3/es-testing/blob/main/LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
-    MIT License ([LICENSE-MIT](https://github.com/ferro2o3/es-testing/blob/main/LICENSE-MIT) or https://opensource.org/licenses/MIT)
+    cluster1    - kibana
+                - es01
+                - es02
+                - es03
 
-# Starting
+    cluster2    - es04
 
-To start the elasticsearch clusters:
+All elasticsearch nodes are multi-functional (master / data / etc). Cluster 2 is setup as single node cluster.
 
-    docker-compose up
+You can hit the clusters at the https endpoints of:
 
-This will start a minimal 2 cluster setup with just one node, to make this compatible with all the exercises required for the Elasticsearch Certification Exam.
+## Cluster 1
+
+- https://localhost:9200/
+
+    curl --cacert ./certs/ca/ca.crt -u elastic:elastic https://localhost:9200
+
+## Cluster 2
+
+- https://localhost:9201/
+
+    curl --cacert ./certs/ca/ca.crt -u elastic:elastic https://localhost:9201
+
 
 # Run the tests
 
@@ -85,3 +88,25 @@ If you are developing new tests, you may need to run instead:
     pip install -r requirements.dev.txt
 
 The main difference is the addition of black and flask8 for code styling / formating.
+
+# References
+
+- [Python Docker image](https://www.docker.com/blog/containerized-python-development-part-1/)
+- [Elasticsearch image](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+- [rustlings](https://github.com/rust-lang/rustlings)
+- [Elasticsearch Certification](https://www.elastic.co/training/elastic-certified-engineer-exam)
+- [Layout](https://hackersandslackers.com/flask-jinja-templates/)
+- [Licensing, Documentation and Style](https://github.com/SergioBenitez/Rocket/blob/master/README.md)
+
+# Contributions
+
+Contributions are welcomed with PRs targeting the main branch. All authors of PRs have to accept that their contributions are lisenced by both APACHE 2.0 and MIT licenses and will be distributed with such licenses. Submission of a PR is acceptence of such terms.
+
+# Licenses
+
+For users, es-testing is licensed under either of the following, at your option:
+
+    Apache License, Version 2.0, ([LICENSE-APACHE](https://github.com/ferro2o3/es-testing/blob/main/LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
+    MIT License ([LICENSE-MIT](https://github.com/ferro2o3/es-testing/blob/main/LICENSE-MIT) or https://opensource.org/licenses/MIT)
+
+Users are free to redistribute on either (or both) of those licenses as they choose.

@@ -2,20 +2,6 @@ from flask import Flask, render_template
 from exercise_runner.exercises import exercises
 from es_testing import es_testing
 
-# server = Flask(__name__)
-
-
-# app = Flask(__name__)
-# app.register_blueprint(exercises)
-
-
-# def hello():
-
-#     my_list = os.listdir("./tests")
-
-
-#     return "Hello World4!"
-
 
 def page_not_found(e):
     return render_template("404.html"), 404

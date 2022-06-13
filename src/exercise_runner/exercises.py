@@ -5,11 +5,15 @@ import subprocess
 
 exercises = Blueprint("exercises", __name__, template_folder="templates")
 
+excluded_folders = ["__pycache__"]
+
 
 def get_test_set(test_folder="./tests"):
     folders = os.listdir(test_folder)
     list_of_exercise_folders = [
-        folder for folder in folders if os.path.isdir(test_folder + "/" + folder)
+        folder
+        for folder in folders
+        if os.path.isdir(test_folder + "/" + folder) and folder not in excluded_folders
     ]
     return list_of_exercise_folders
 
@@ -93,7 +97,7 @@ def get_description(exercise_set, number):
 def show(number):
 
     number = int(number)
-    current_set = get_current_set("./tests")
+    current_set = get_current_set()
 
     if not current_set:
         return redirect("/choose-exercise-set", code=302)
